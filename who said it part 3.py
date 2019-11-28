@@ -36,7 +36,7 @@ def normalize(word):
 # values are the counts for those words.
 def get_counts(filename):
     result_dict = {}
-    wordTotal = ""
+    wordTotal = 0
     file = open(filename, "r")
 
     for i in file:
@@ -44,36 +44,41 @@ def get_counts(filename):
         for j in i:
             j = normalize(j)
             if j != "":
-                result_dict[word]
-                result_dict.append(j)
-    close(filename)        
+                if j in result_dict:
+                    result_dict[j] = result_dict[j] + 1
+                    wordTotal = wordTotal + 1
+                else:
+                    result_dict[j] = 1
+                    wordTotal = wordTotal + 1
+        result_dict["_total"] = wordTotal
+    file.close()       
     return(result_dict)
 
 def predict(userInput, shakespeare_counts, austen_counts):
-    shakespeare_score: ""
-    austen_score: ""
+    shakespeare_score = 0
+    austen_score = 0
     userInput = userInput.split()
     for i in userInput:
         i = normalize(i)
         if i != "":
-            shakespeare_score = shakespeare_score + get_score(shakespeare_counts)
-            austen_score = austen_score + get_score(austen_counts)
+            shakespeare_score = shakespeare_score + get_score(i,shakespeare_counts)
+            austen_score = austen_score + get_score(i,austen_counts)
+    if austen_score > shakespeare_score:
+        return("I think that was written by Jane Austen")
+    elif shakespeare_score > austen_score:
+        return("I think that was written by Shakespeare")
+
 # Get the counts for the two shortened versions
 # of the texts
 shakespeare_counts = get_counts("hamlet.txt")
-austen_counts = get_counts("pride_and_prejudice.txt")
+austen_counts = get_counts("pride-and-prejudice.txt")
+austen_score = 0
+shakespeare_score = 0
 
 userInput = input("Input your text: ")
+print(predict(userInput, shakespeare_counts, austen_counts))
 
 # Check the contents of the dictionaries
-for key in shakespeare_counts:
-    print(key + ": " + str(shakespeare_counts[key]))
-
-if austen_score >= shakespeare_score:
-    print("I think that was written by Jane Austen")
-elif shakespeare_score >= austen_score:
-    print("I think that was written by Shakespeare")
 
 print("-----")
 
-for key in austen_counts:
